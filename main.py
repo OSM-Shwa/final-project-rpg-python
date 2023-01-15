@@ -4,8 +4,11 @@ run = True
 menu = True
 play = False
 rules = False
+key = False
+
 
 # player stats
+stats = {"HP": 50, "ATK": 3, "pot": 1, "elix": 0, "gold": 0, "x": 0, "y": 0}
 HP = 50
 ATK = 3
 pot = 1
@@ -52,14 +55,17 @@ def load_game():
 
 # save the game to the load.txt file
 def save_game():
-    list = [
-        name,
-        str(HP),
-        str(ATK),
-    ]
+    # list = [
+    #     name,
+    #     str(HP),
+    #     str(ATK),
+    #     str(pot),
+    #     str(elix),
+    #     str
+    # ]
 
     with open("load.txt", "w") as f:
-        for item in list:
+        for item in stats.values:
             f.write(item + "\n")
 
 
