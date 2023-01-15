@@ -10,7 +10,7 @@ ATK = 3
 
 
 def clear():
-    os.system("cls")
+    os.system("clear")
 
 
 def load_game():
@@ -19,6 +19,7 @@ def load_game():
         name = load_list[0].strip("\n")
         HP = load_list[1].strip("\n")
         ATK = load_list[2].strip("\n")
+        clear()
         print(f"Welcome back, {name}")
 
     return [name, HP, ATK]
@@ -38,6 +39,7 @@ def save_game():
 
 while run:
     while menu:
+        clear()
         print("1. NEW GAME")
         print("2. LOAD GAME")
         print("3. RULES")
@@ -52,6 +54,7 @@ while run:
             choice = input("# ")
 
         if choice == "1":
+            clear()
             name = input("What's your name, hero? ")
             menu = False
             play = True
