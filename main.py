@@ -3,7 +3,6 @@ import os
 run = True
 menu = True
 play = False
-rules = False
 
 HP = 50
 ATK = 3
@@ -14,7 +13,7 @@ def clear():
 
 
 def draw():
-    print("xX-------------------------xX")
+    print("xX-------------------------Xx")
 
 
 def load_game():
@@ -27,6 +26,12 @@ def load_game():
         print(f"Welcome back, {name}")
 
     return [name, HP, ATK]
+
+
+def rules():
+    draw()
+    print("I'm the creator of this game and these are the rules!")
+    draw()
 
 
 def save_game():
@@ -51,13 +56,7 @@ while run:
         print("4. QUIT GAME")
         draw()
 
-        if rules:
-            print("I'm the creator of this game and these are the rules!")
-            rules = False
-            choice = ""
-            input("> ")
-        else:
-            choice = input("# ")
+        choice = input("# ")
 
         if choice == "1":
             clear()
@@ -70,13 +69,14 @@ while run:
             menu = False
             play = True
         elif choice == "3":
-            rules = True
+            rules()
         elif choice == "4":
             quit()
 
     while play:
         save_game()  # autosave
 
+        clear()
         draw()
         print("0 - SAVE AND QUIT")
         draw()
