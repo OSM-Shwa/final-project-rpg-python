@@ -1,3 +1,5 @@
+import os
+
 run = True
 menu = True
 play = False
@@ -7,13 +9,19 @@ HP = 50
 ATK = 3
 
 
+def clear():
+    os.system("cls")
+
+
 def load_game():
     with open("load.txt", "r") as f:
         load_list = f.readlines()
         name = load_list[0].strip("\n")
         HP = load_list[1].strip("\n")
         ATK = load_list[2].strip("\n")
-        print(name, HP, ATK)
+        print(f"Welcome back, {name}")
+
+    return [name, HP, ATK]
 
 
 def save_game():
@@ -48,7 +56,10 @@ while run:
             menu = False
             play = True
         elif choice == "2":
-            load_game()
+            name, HP, ATK = load_game()
+            input(">")
+            menu = False
+            play = True
         elif choice == "3":
             rules = True
         elif choice == "4":
@@ -56,7 +67,6 @@ while run:
 
     while play:
         save_game()  # autosave
-
         print(name)
 
         dest = input("# ")
