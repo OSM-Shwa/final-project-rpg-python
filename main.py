@@ -8,6 +8,12 @@ rules = False
 # player stats
 HP = 50
 ATK = 3
+pot = 1
+elix = 0
+gold = 0
+x = 0
+y = 0
+
 
 # clear the screen
 def clear():
