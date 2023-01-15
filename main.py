@@ -7,7 +7,16 @@ HP = 50
 ATK = 3
 
 
-def save():
+def load_game():
+    with open("load.txt", "r") as f:
+        load_list = f.readlines()
+        name = load_list[0].strip("\n")
+        HP = load_list[1].strip("\n")
+        ATK = load_list[2].strip("\n")
+        print(name, HP, ATK)
+
+
+def save_game():
     list = [
         name,
         str(HP),
@@ -39,16 +48,19 @@ while run:
             menu = False
             play = True
         elif choice == "2":
-            pass
+            load_game()
         elif choice == "3":
             rules = True
         elif choice == "4":
             quit()
 
     while play:
+        save_game()  # autosave
+
         print(name)
 
         dest = input("# ")
         if dest == "0":  # get back to main menu
             play = False
             menu = True
+            save_game()
