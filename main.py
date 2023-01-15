@@ -3,6 +3,21 @@ menu = True
 play = False
 rules = False
 
+HP = 50
+ATK = 3
+
+
+def save():
+    list = [
+        name,
+        str(HP),
+        str(ATK),
+    ]
+
+    with open("load.txt", "w") as f:
+        for item in list:
+            f.write(item + "\n")
+
 
 while run:
     while menu:
@@ -32,3 +47,8 @@ while run:
 
     while play:
         print(name)
+
+        dest = input("# ")
+        if dest == "0":  # get back to main menu
+            play = False
+            menu = True
