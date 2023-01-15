@@ -13,6 +13,10 @@ def clear():
     os.system("clear")
 
 
+def draw():
+    print("xX-------------------------xX")
+
+
 def load_game():
     with open("load.txt", "r") as f:
         load_list = f.readlines()
@@ -40,10 +44,12 @@ def save_game():
 while run:
     while menu:
         clear()
+        draw()
         print("1. NEW GAME")
         print("2. LOAD GAME")
         print("3. RULES")
         print("4. QUIT GAME")
+        draw()
 
         if rules:
             print("I'm the creator of this game and these are the rules!")
@@ -70,7 +76,10 @@ while run:
 
     while play:
         save_game()  # autosave
-        print(name)
+
+        draw()
+        print("0 - SAVE AND QUIT")
+        draw()
 
         dest = input("# ")
         if dest == "0":  # get back to main menu
