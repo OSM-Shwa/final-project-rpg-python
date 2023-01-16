@@ -1,5 +1,6 @@
 import os
-
+from map import map
+from biomes import biomes
 run = True
 menu = True
 play = False
@@ -7,8 +8,6 @@ rules = False
 key = False
 
 
-# player stats
-stats = {"HP": 50, "ATK": 3, "pot": 1, "elix": 0, "gold": 0, "x": 0, "y": 0}
 HP = 50
 ATK = 3
 pot = 1
@@ -16,6 +15,12 @@ elix = 0
 gold = 0
 x = 0
 y = 0
+
+return_to_menu = "Please [enter] to return to menu: "
+
+
+y_len = len(map) - 1
+x_len = len(map[0]) - 1
 
 
 # clear the screen
@@ -28,7 +33,7 @@ def rules(rules):
     draw()
     print("I'm the creator of this game and these are the rules!")
     draw()
-    input("Press [enter] to return to menu: ")
+    input(return_to_menu)
     return False
 
 
@@ -41,55 +46,68 @@ OPTIONS = ["NEW GAME", "LOAD GAME", "RULES", "QUIT GAME"]
 
 # load a previous game
 def load_game():
-    with open("load.txt", "r") as f:
-        load_list = [n.strip("\n") for n in f.readlines()]
-        print(load_list)
-        # name = load_list[0].strip("\n")
-        # HP = load_list[1].strip("\n")
-        # ATK = load_list[2].strip("\n")
-        clear()
-        print(f"Welcome back, {load_list[0]}")
-
-    return load_list
+    ...
 
 
 # save the game to the load.txt file
 def save_game():
-    # list = [
-    #     name,
-    #     str(HP),
-    #     str(ATK),
-    #     str(pot),
-    #     str(elix),
-    #     str
-    # ]
-
+    list = [
+        name,
+        str(HP),
+        str(ATK),
+        str(pot),
+        str(elix),
+        str(gold),
+        str(x),
+        str(y),
+        str(key),
+    ]
     with open("load.txt", "w") as f:
-        for item in stats.values:
-            f.write(item + "\n")
+        for item in list:
+            f.write(f"{item} \n")
 
 
 # main game loop
 while run:
     while menu:
-        clear()
+        # clear()
         draw()
         for idx, option in enumerate(OPTIONS, start=1):
             print(f"{idx}. {option}")
         draw()
-
         choice = input("# ")
 
         if choice == "1":
             clear()
-            name = input("# What's your name, hero? ")
+            name = input("# What's your name, hero? ").strip()
             menu = False
             play = True
         elif choice == "2":
-            name, HP, ATK = load_game()
-            input("Press [enter] to continue: ")
-            menu = False
-            play = True
+            try:
+                with open("load.txt", "r") as f:
+                    load_list = f.readlines()
+                    if len(load_list) == 9:
+                        name = load_list[0][:-1].strip()
+                        HP = int(load_list[1][:-1])
+                        ATK = int(load_list[2][:-1])
+                        pot = int(load_list[3][:-1])
+                        elix = int(load_list[4][:-1])
+                        gold = int(load_list[5][:-1])
+                        x = int(load_list[6][:-1])
+                        y = int(load_list[7][:-1])
+                        key = bool(load_list[8][:-1])
+                        clear()
+                        print(f"Welcome back, {name}!")
+                        input("Press [enter] to continue: ")
+                        menu = False
+                        play = True
+                    else:
+                        print("Corrupt save file!")
+                        input(return_to_menu)
+            except OSError:
+                print("No loadable save file!")
+                input(return_to_menu)
+
         elif choice == "3":
             choice = ""
             rules(rules)

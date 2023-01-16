@@ -1,3 +1,9 @@
-Joshua
-50
-3
+Joshua G 
+50 
+3 
+1 
+0 
+0 
+0 
+0 
+False 
