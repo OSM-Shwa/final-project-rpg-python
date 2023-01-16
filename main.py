@@ -1,6 +1,7 @@
 import os
 from map import map
 from biomes import biomes
+
 run = True
 menu = True
 play = False
@@ -13,15 +14,20 @@ ATK = 3
 pot = 1
 elix = 0
 gold = 0
-x = 0
-y = 0
+row = 0
+col = 0
 
 return_to_menu = "Please [enter] to return to menu: "
 
+row_len = len(map) - 1
+col_len = len(map[0]) - 1
 
-y_len = len(map) - 1
-x_len = len(map[0]) - 1
-
+current_tile = map[row][col]
+print(current_tile)
+name_of_tile = biomes[current_tile]["t"]
+print(name_of_tile)
+enemy_tile = biomes[current_tile]["e"]
+print(enemy_tile)
 
 # clear the screen
 def clear():
