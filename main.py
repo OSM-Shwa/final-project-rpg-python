@@ -10,30 +10,31 @@ key = False
 
 
 HP = 50
+HPMAX = HP
 ATK = 3
 pot = 1
 elix = 0
 gold = 0
-row = 0
-col = 0
+x = 0  # col
+y = 0  # row
+OPTIONS = ["NEW GAME", "LOAD GAME", "RULES", "QUIT GAME"]
 
-return_to_menu = "Please [enter] to return to menu: "
 
-row_len = len(map) - 1
-col_len = len(map[0]) - 1
+return_to_menu = "Press [enter] to return to menu: "
 
-current_tile = map[row][col]
-print(current_tile)
+# stuff for map
+y_len = len(map) - 1
+x_len = len(map[0]) - 1
+current_tile = map[y][x]
 name_of_tile = biomes[current_tile]["t"]
-print(name_of_tile)
 enemy_tile = biomes[current_tile]["e"]
-print(enemy_tile)
 
 # clear the screen
 def clear():
     os.system("clear")
 
 
+# the game rules
 def rules(rules):
     clear()
     draw()
@@ -47,8 +48,6 @@ def rules(rules):
 def draw():
     print("xX-------------------------Xx")
 
-
-OPTIONS = ["NEW GAME", "LOAD GAME", "RULES", "QUIT GAME"]
 
 # load a previous game
 def load_game():
@@ -76,7 +75,7 @@ def save_game():
 # main game loop
 while run:
     while menu:
-        # clear()
+        clear()
         draw()
         for idx, option in enumerate(OPTIONS, start=1):
             print(f"{idx}. {option}")
@@ -123,9 +122,27 @@ while run:
     while play:
         save_game()  # autosave
 
-        clear()
+        print()
+        draw()
+        print(f"LOCATION: {biomes[map[y][x]]['t']}")
+        draw()
+        print(f"NAME: {name}")
+        print(f"HP: {HP}/{HPMAX}")
+        print(f"ATK: {ATK}")
+        print(f"POTIONS: {pot}")
+        print(f"ELIXIRS: {elix}")
+        print(f"GOLD: {gold}")
+        print(f"COORDS: {x},{y}")
         draw()
         print("0 - SAVE AND QUIT")
+        if y > 0:
+            print("1 - NORTH")
+        if x < x_len:
+            print("2 - EAST")
+        if y < y_len:
+            print("3 - SOUTH")
+        if x > 0:
+            print("4 - WEST")
         draw()
 
         dest = input("# ")
@@ -133,3 +150,15 @@ while run:
             play = False
             menu = True
             save_game()
+        elif dest == "1":
+            if y > 0:
+                y -= 1
+        elif dest == "2":
+            if x < x_len:
+                x += 1
+        elif dest == "3":
+            if y < y_len:
+                y += 1
+        elif dest == "4":
+            if x > 0:
+                x -= 1
