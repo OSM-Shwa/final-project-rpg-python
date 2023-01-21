@@ -1,8 +1,8 @@
 # the game map
 map = [
-    ["plains", "plains", "plains", "plains", "forest", "mountain", "cave"],
-    ["forest", "forest", "forest", "forest", "forest", "hills", "mountain"],
-    ["forest", "fields", "bridge", "plains", "hills", "forest", "hills"],
+    ["mountain", "bridge", "shop", "plains", "forest", "mountain", "cave"],
+    ["forest", "forest", "forest", "village", "forest", "hills", "mountain"],
+    ["town", "fields", "bridge", "plains", "hills", "cove", "hills"],
     ["plains", "shop", "town", "major", "plains", "hills", "mountain"],
-    ["plains", "fields", "fields", "plains", "hills", "mountain", "mountain"],
+    ["bridge", "fields", "fields", "plains", "hills", "mountain", "village"],
 ]

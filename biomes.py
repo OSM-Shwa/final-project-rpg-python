@@ -9,4 +9,6 @@ biomes = {
     "cave": {"t": "CAVE", "e": False},
     "mountain": {"t": "MOUNTAIN", "e": True},
     "hills": {"t": "HILLS", "e": True},
+    "cove": {"t": "COVE", "e": False},
+    "village": {"t": "VILLAGE", "e": True},
 }
