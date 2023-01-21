@@ -21,6 +21,7 @@ play = False
 # }
 
 # game variables
+name = ""
 HP = 50
 HPMAX = HP
 ATK = 3
