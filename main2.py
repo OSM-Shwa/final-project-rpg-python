@@ -10,7 +10,7 @@ menu = True
 play = False
 key = False
 standing = True
-battle = False
+fight = False
 
 # game options
 OPTIONS = ["NEW GAME", "LOAD GAME", "RULES", "QUIT GAME"]
@@ -125,7 +125,7 @@ class Game:
 
     # creates an enemy with these stats
     def create_enemy(self, name: str, hp: int, atk: int, gold: int):
-        self.enemies[name] = Enemy(name, hp, atk, gold)
+        self.enemies.append(Enemy(name, hp, atk, gold))
 
     # when you start the game, create some enemies
     def __init__(self, ui: UI, player: Player):
@@ -176,9 +176,7 @@ class Game:
                 input("Press [enter] to continue: ")
                 menu = False
                 play = True
-                return self.player.__init__(
-                    name, HP, HPMAX, ATK, pot, elix, gold, x, y, key
-                )
+                return self.player.__init__(name, HP, ATK, pot, elix, gold, x, y, key)
             else:
                 print("\nCorrupt save file!")
                 input(return_to_menu)
@@ -190,15 +188,19 @@ class Game:
         if dest == "1":
             if self.player.y > 0:
                 self.player.y -= 1
+                standing = False
         elif dest == "2":
             if self.player.x < x_len:
                 self.player.x += 1
+                standing = False
         elif dest == "3":
             if self.player.y < y_len:
                 self.player.y += 1
+                standing = False
         elif dest == "4":
             if self.player.x > 0:
                 self.player.x -= 1
+                standing = False
 
     def run(self):
         global menu, run, play
@@ -233,6 +235,13 @@ class Game:
 
             while play:
                 self.save()  # autosave
+
+                if not standing:
+                    if biomes[map[player.y][player.x]]["e"]:
+                        if random.randint(1, 100) <= 30:
+                            fight = True
+                            self.battle()
+
                 self.ui.display_game_info(player)
                 dest = input("# ")
                 if dest == "0":  # get back to main menu
