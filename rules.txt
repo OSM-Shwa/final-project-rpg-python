@@ -1,0 +1,6 @@
+When you run this program, you will be brought to a start menu with a few different options.
+When you start a new game (1), you will be prompted to enter your name, then you will be transported to a location, based on a map.
+You will have to fight some enemies along the way, and your health will decrease if they hit you with their attack.
+The game will autosave everytime you switch locations.
+You have the freedom do go where ever you want and there is no set game path.
+Have fun!
