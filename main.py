@@ -1,6 +1,5 @@
 import os
 import random
-from typing import List
 
 from biomes import biomes
 from map import map
@@ -26,16 +25,16 @@ class Player:
         name="",
         hp=50,
         atk=3,
-        pot=10,
+        pot=6,
         elix=3,
-        gold=100,
+        gold=50,
         x=0,
         y=0,
         key=False,
     ):
         self.name = name
         self.hp = hp
-        self.HPMAX = 500
+        self.HPMAX = 200
         self.atk = atk
         self.pot = pot
         self.elix = elix
@@ -285,7 +284,7 @@ class Game:
                     print("Congradulations, you have finished the game!")
                     self.boss = False
                     self.running = False
-                    self.play= False
+                    self.play = False
 
                 input("> ")
 
@@ -465,7 +464,7 @@ class Game:
 
                 if not self.standing:
                     if biomes[map[player.y][player.x]]["e"]:
-                        if random.randint(0, 100) < 0:
+                        if random.randint(0, 100) <= 30:
                             self.fight = True
                             self.battle()
 
