@@ -24,19 +24,19 @@ class Player:
     def __init__(
         self,
         name="",
-        HP=50,
-        ATK=3,
+        hp=50,
+        atk=3,
         pot=10,
         elix=3,
-        gold=0,
+        gold=100,
         x=0,
         y=0,
         key=False,
     ):
         self.name = name
-        self.HP = HP
+        self.hp = hp
         self.HPMAX = 500
-        self.ATK = ATK
+        self.atk = atk
         self.pot = pot
         self.elix = elix
         self.gold = gold
@@ -95,8 +95,8 @@ class UI:
         print(f"LOCATION: {biomes[map[player.y][player.x]]['t']}")
         draw()
         print(f"NAME: {player.name}")
-        print(f"HP: {player.HP}/{player.HPMAX}")
-        print(f"ATK: {player.ATK}")
+        print(f"HP: {player.hp}/{player.HPMAX}")
+        print(f"ATK: {player.atk}")
         print(f"POTIONS: {player.pot}")
         print(f"ELIXIR: {player.elix}")
         print(f"GOLD: {player.gold}")
@@ -111,12 +111,12 @@ class UI:
             print("3 - SOUTH")
         if player.x > 0:
             print("4 - WEST")
-        if player.HP < player.HPMAX:
+        if player.hp < player.HPMAX:
             if player.pot > 0:
                 print("5 - USE POTION (30HP)")
             if player.elix > 0:
                 print("6 - USE ELIXIR (50HP)")
-        if ["shop", "mayor", "cave"] in map[player.x][player.y]:
+        if map[player.y][player.x] in ["shop", "mayor", "cave"]:
             print("7 - ENTER")
         draw()
 
@@ -132,9 +132,6 @@ class Game:
 
     # when you start the game, create some enemies
     def __init__(self, ui: UI, player: Player):
-        self.create_enemy("Goblin", 15, 3, 8)
-        self.create_enemy("Ogre", 35, 5, 18)
-        self.create_enemy("Slime", 30, 2, 12)
         self.ui = ui
         self.player = player
         self.running = True
@@ -145,15 +142,17 @@ class Game:
         self.buy = False
         self.speak = False
         self.boss = False
-
-        # boss = Boss("Dragon", 100, 8, 100)
+        self.create_enemy("Goblin", 15, 3, 8)
+        self.create_enemy("Ogre", 35, 5, 18)
+        self.create_enemy("Slime", 30, 2, 12)
+        self.boss = Boss("Dragon", 100, 8, 100)
 
     # saves the player's data to a file
     def save(self):
         list = [
             str(self.player.name),
-            str(self.player.HP),
-            str(self.player.ATK),
+            str(self.player.hp),
+            str(self.player.atk),
             str(self.player.pot),
             str(self.player.elix),
             str(self.player.gold),
@@ -167,15 +166,15 @@ class Game:
                 f.write(f"{item} \n")
 
     # retrieves the player's data and uses that to load the game
-    def load(self) -> Player:
+    def load(self):
         # load a previous game
 
         with open("load.txt", "r") as f:
             load_list = f.readlines()
             if len(load_list) == 9:
                 name = str(load_list[0][:-1].strip())
-                HP = int(load_list[1][:-1])
-                ATK = int(load_list[2][:-1])
+                hp = int(load_list[1][:-1])
+                atk = int(load_list[2][:-1])
                 pot = int(load_list[3][:-1])
                 elix = int(load_list[4][:-1])
                 gold = int(load_list[5][:-1])
@@ -189,8 +188,8 @@ class Game:
                 self.play = True
                 return self.player.__init__(
                     name=name,
-                    HP=HP,
-                    ATK=ATK,
+                    hp=hp,
+                    atk=atk,
                     pot=pot,
                     elix=elix,
                     gold=gold,
@@ -203,11 +202,11 @@ class Game:
                 input("> ")
 
     def heal(self, amount):
-        if self.player.HP + amount < self.player.HPMAX:
-            self.player.HP += amount
+        if self.player.hp + amount < self.player.HPMAX:
+            self.player.hp += amount
         else:
-            self.player.HP = self.player.HPMAX
-        print(f"{self.player.name}'s HP refilled to {self.player.HP}!")
+            self.player.hp = self.player.HPMAX
+        print(f"{self.player.name}'s HP refilled to {self.player.hp}!")
 
     def battle(self):
         enemy = random.choice(self.enemies)
@@ -222,7 +221,7 @@ class Game:
             print(f"Defeat the {enemy.name}!")
             draw()
             print(f"{enemy.name}'s HP: {hp}/{hpmax}")
-            print(f"{self.player.name}'s HP: {self.player.HP}/{self.player.HPMAX}")
+            print(f"{self.player.name}'s HP: {self.player.hp}/{self.player.HPMAX}")
             print(f"POTIONS: {self.player.pot}")
             print(f"ELIXIR: {self.player.elix}")
             draw()
@@ -235,17 +234,17 @@ class Game:
 
             choice = input("# ")
             if choice == "1":
-                hp -= self.player.ATK
-                print(f"You dealt {self.player.ATK} damage to the {enemy.name}!")
+                hp -= self.player.atk
+                print(f"You dealt {self.player.atk} damage to the {enemy.name}!")
                 if hp > 0:
-                    self.player.HP -= atk
+                    self.player.hp -= atk
                     print(f"{enemy.name} dealt {atk} damage to the you!")
                 input("> ")
             elif choice == "2":
                 if self.player.pot > 0:
                     self.player.pot -= 1
                     self.heal(30)
-                    self.player.HP -= atk
+                    self.player.hp -= atk
                     print(f"{enemy.name} dealt {atk} damage to the you!")
                 else:
                     print("No potions!")
@@ -254,13 +253,13 @@ class Game:
                 if self.player.elix > 0:
                     self.player.elix -= 1
                     self.heal(50)
-                    self.player.HP -= atk
+                    self.player.hp -= atk
                     print(f"{enemy.name} dealt {atk} damage to the you!")
                 else:
                     print("No potions!")
                 input("> ")
 
-            if self.player.HP <= 0:
+            if self.player.hp <= 0:
                 print(f"{enemy.name} has defeated {self.player.name}...")
                 draw()
                 self.fight = False
@@ -281,7 +280,89 @@ class Game:
                 self.standing = True
                 input("> ")
 
-    def move_locations(self, dest):
+    def mayor(self):
+        while self.speak:
+            self.ui.clear()
+            draw()
+            print(f"Hello there, {self.player.name}!")
+            if self.player.atk < 10:
+                print(
+                    "You are not strong enough to face the dragon yet. Keep practicing and come back later!"
+                )
+                self.player.key = False
+            else:
+                print(
+                    "You might want to take on the dragon now! Take this key but be careful with the beast..."
+                )
+                self.player.key = True
+
+            draw()
+            print("1 - LEAVE")
+            draw()
+
+            choice = input("# ")
+            if choice == "1":
+                self.speak = False
+
+    def shop(self):
+
+        while self.buy:
+            self.save()
+            self.ui.clear()
+            draw()
+            print("Welcome to the shop!")
+            draw()
+            print(f"GOLD: {self.player.gold}")
+            print(f"POTIONS: {self.player.pot}")
+            print(f"ELIXIR: {self.player.elix}")
+            print(f"ATK: {self.player.atk}")
+            draw()
+            print("1 - BUY POTION (30HP) - 5 GOLD")
+            print("2 - BUY ELIXIR (50HP) - 8 GOLD")
+            print("3 - UPGRADE WEAPON (+2ATK) - 10 GOLD")
+            print("4 - LEAVE")
+            draw()
+
+            choice = input("# ")
+            if choice == "1":
+                if self.player.gold >= 5:
+                    self.player.pot += 1
+                    self.player.gold -= 5
+                    print("You've bought a potion!")
+                else:
+                    print("You don't have enough gold for this item...")
+                input("> ")
+            elif choice == "2":
+                if self.player.gold >= 8:
+                    self.player.elix += 1
+                    self.player.gold -= 8
+                    print("You've bought an elixir!")
+                else:
+                    print("You don't have enough gold for this item...")
+                input("> ")
+            elif choice == "3":
+                if self.player.gold >= 10:
+                    self.player.atk += 2
+                    self.player.gold -= 10
+                    print("You've upgraded your weapon!")
+                else:
+                    print("You don't have enough gold for this item...")
+                input("> ")
+            elif choice == "4":
+                self.buy = False
+
+    def cave(self):
+        while self.boss:
+            self.ui.clear()
+            draw()
+            print(f"Here lies the cave of the {self.boss.name}. What will you do?")
+            draw()
+
+            if self.player.key:
+                print("1 - USE KEY")
+            print("2 - TURN BACK")
+
+    def action(self, dest):
         if dest == "0":  # get back to main menu
             self.play = False
             self.menu = True
@@ -303,7 +384,7 @@ class Game:
                 self.player.x -= 1
                 self.standing = False
         elif dest == "5":
-            if self.player.HP == self.player.HPMAX:
+            if self.player.hp == self.player.HPMAX:
                 print("Health is already full!")
             elif self.player.pot > 0:
                 self.player.pot -= 1
@@ -312,7 +393,7 @@ class Game:
                 print("No potions!")
             input("> ")
         elif dest == "6":
-            if self.player.HP == self.player.HPMAX:
+            if self.player.hp == self.player.HPMAX:
                 print("Health is already full!")
             elif self.player.elix > 0:
                 self.player.elix -= 1
@@ -321,11 +402,13 @@ class Game:
                 print("No elixir!")
             input("> ")
         elif dest == "7":
-            if map[self.player.x][self.player.y] == "shop":
+            if map[self.player.y][self.player.x] == "shop":
                 self.buy = True
-            elif map[self.player.x][self.player.y] == "mayor":
+                self.shop()
+            elif map[self.player.y][self.player.x] == "mayor":
                 self.speak = True
-            elif map[self.player.x][self.player.y] == "cave":
+                self.mayor()
+            elif map[self.player.y][self.player.x] == "cave":
                 self.boss = True
         else:
             self.standing = True
@@ -364,7 +447,7 @@ class Game:
 
                 if not self.standing:
                     if biomes[map[player.y][player.x]]["e"]:
-                        if random.randint(0, 100) <= 30:
+                        if random.randint(0, 100) < 0:
                             self.fight = True
                             self.battle()
 
@@ -372,8 +455,8 @@ class Game:
 
                 if self.play:
                     self.ui.display_game_info(player)
-                    dest = input("# ")
-                    self.move_locations(dest)
+                    action = input("# ")
+                    self.action(action)
 
 
 if __name__ == "__main__":
