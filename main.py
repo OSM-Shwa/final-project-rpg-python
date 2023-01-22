@@ -145,7 +145,7 @@ class Game:
         self.create_enemy("Goblin", 15, 3, 8)
         self.create_enemy("Ogre", 35, 5, 18)
         self.create_enemy("Slime", 30, 2, 12)
-        self.boss = Boss("Dragon", 100, 8, 100)
+        self.b = Boss("Dragon", 100, 8, 100)
 
     # saves the player's data to a file
     def save(self):
@@ -209,7 +209,10 @@ class Game:
         print(f"{self.player.name}'s HP refilled to {self.player.hp}!")
 
     def battle(self):
-        enemy = random.choice(self.enemies)
+        if not self.boss:
+            enemy = random.choice(self.enemies)
+        else:
+            enemy = self.b
         hp = enemy.hp
         hpmax = hp
         atk = enemy.atk
@@ -277,7 +280,13 @@ class Game:
                 if random.randint(0, 100) < 30:
                     self.player.pot += 1
                     print("You've found a potion!")
-                self.standing = True
+                if enemy == self.b:
+                    draw()
+                    print("Congradulations, you have finished the game!")
+                    self.boss = False
+                    self.running = False
+                    self.play= False
+
                 input("> ")
 
     def mayor(self):
@@ -355,12 +364,20 @@ class Game:
         while self.boss:
             self.ui.clear()
             draw()
-            print(f"Here lies the cave of the {self.boss.name}. What will you do?")
+            print(f"Here lies the cave of the {self.b.name}. What will you do?")
             draw()
 
             if self.player.key:
                 print("1 - USE KEY")
             print("2 - TURN BACK")
+
+            choice = input("# ")
+            if choice == "1":
+                if self.player.key:
+                    self.fight = True
+                    self.battle()
+            elif choice == "2":
+                self.boss = False
 
     def action(self, dest):
         if dest == "0":  # get back to main menu
@@ -410,6 +427,7 @@ class Game:
                 self.mayor()
             elif map[self.player.y][self.player.x] == "cave":
                 self.boss = True
+                self.cave()
         else:
             self.standing = True
 

@@ -5,5 +5,5 @@ Joshua
 3 
 60 
 3 
-3 
-False 
+2 
+True 
