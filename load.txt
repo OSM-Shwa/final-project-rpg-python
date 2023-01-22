@@ -1,9 +1,9 @@
 Joshua 
-50 
+500 
 3 
-1 
+2 
 0 
 0 
 0 
 0 
-False 
+True 
