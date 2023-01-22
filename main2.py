@@ -5,13 +5,6 @@ from typing import List
 from biomes import biomes
 from map import map
 
-run = True
-menu = True
-play = False
-key = False
-standing = True
-fight = False
-
 # game options
 OPTIONS = ["NEW GAME", "LOAD GAME", "RULES", "QUIT GAME"]
 
@@ -52,11 +45,16 @@ class Player:
         self.gold = gold
         self.x = x
         self.y = y
-        self.key = False
+        self.key = key
 
     # sets the player's name
     def set_name(self):
-        self.name = input("# What's your name, hero? ").strip()
+        while True:
+            self.name = input("# What's your name, hero? ").strip()
+            if self.name == "":
+                print("Invalid input. Try again.")
+                continue
+            break
 
 
 # creates some enemies
@@ -66,6 +64,9 @@ class Enemy:
         self.hp = hp
         self.atk = atk
         self.gold = gold
+
+    def __str__(self):
+        return self.name
 
 
 # this is the boss class which has all the same variables as a regular enemy
@@ -84,7 +85,6 @@ class UI:
         os.system("clear")
 
     # draw lines above the code
-    @classmethod
     def display_rules(self):
         with open("rules.txt", "r") as f:
             draw()
@@ -121,7 +121,7 @@ class UI:
 # the main game
 class Game:
 
-    enemies = {}
+    enemies = []
 
     # creates an enemy with these stats
     def create_enemy(self, name: str, hp: int, atk: int, gold: int):
@@ -134,12 +134,18 @@ class Game:
         self.create_enemy("Slime", 30, 2, 12)
         self.ui = ui
         self.player = player
+        self.running = True
+        self.menu = True
+        self.play = False
+        self.standing = True
+        self.fight = False
+
         # boss = Boss("Dragon", 100, 8, 100)
 
     # saves the player's data to a file
     def save(self):
         list = [
-            self.player.name,
+            str(self.player.name),
             str(self.player.HP),
             str(self.player.ATK),
             str(self.player.pot),
@@ -156,13 +162,12 @@ class Game:
 
     # retrieves the player's data and uses that to load the game
     def load(self) -> Player:
-        global menu, play
         # load a previous game
 
         with open("load.txt", "r") as f:
             load_list = f.readlines()
             if len(load_list) == 9:
-                name = load_list[0][:-1].strip()
+                name = str(load_list[0][:-1].strip())
                 HP = int(load_list[1][:-1])
                 ATK = int(load_list[2][:-1])
                 pot = int(load_list[3][:-1])
@@ -174,38 +179,51 @@ class Game:
                 self.ui.clear()
                 print(f"Welcome back, {name}!")
                 input("Press [enter] to continue: ")
-                menu = False
-                play = True
-                return self.player.__init__(name, HP, ATK, pot, elix, gold, x, y, key)
+                self.menu = False
+                self.play = True
+                return self.player.__init__(
+                    name=name,
+                    HP=HP,
+                    ATK=ATK,
+                    pot=pot,
+                    elix=elix,
+                    gold=gold,
+                    x=x,
+                    y=y,
+                    key=key,
+                )
             else:
                 print("\nCorrupt save file!")
                 input(return_to_menu)
 
     def battle(self):
-        pass
+        enemy = random.choice(self.enemies)
+        hp = enemy.hp
+        hpmax = hp
+        atk = enemy.atk
+        gold = enemy.gold
 
     def move_locations(self, dest):
         if dest == "1":
             if self.player.y > 0:
                 self.player.y -= 1
-                standing = False
+                self.standing = False
         elif dest == "2":
             if self.player.x < x_len:
                 self.player.x += 1
-                standing = False
+                self.standing = False
         elif dest == "3":
             if self.player.y < y_len:
                 self.player.y += 1
-                standing = False
+                self.standing = False
         elif dest == "4":
             if self.player.x > 0:
                 self.player.x -= 1
-                standing = False
+                self.standing = False
 
     def run(self):
-        global menu, run, play
-        while run:
-            while menu:
+        while self.running:
+            while self.menu:
                 self.ui.clear()
                 draw()
                 # print the options to the screen
@@ -217,12 +235,11 @@ class Game:
                 if choice == "1":
                     self.ui.clear()
                     self.player.set_name()
-                    menu = False
-                    play = True
+                    self.menu = False
+                    self.play = True
                 elif choice == "2":
                     try:
-                        self.player = self.load()
-                        print(player)
+                        self.load()
                     except OSError:
                         print("\nNo loadable save file!")
                         input(return_to_menu)
@@ -233,20 +250,20 @@ class Game:
                 elif choice == "4":
                     quit()
 
-            while play:
+            while self.play:
                 self.save()  # autosave
 
-                if not standing:
+                if not self.standing:
                     if biomes[map[player.y][player.x]]["e"]:
-                        if random.randint(1, 100) <= 30:
-                            fight = True
+                        if random.randint(0, 100) <= 30:
+                            self.fight = True
                             self.battle()
 
                 self.ui.display_game_info(player)
                 dest = input("# ")
                 if dest == "0":  # get back to main menu
-                    play = False
-                    menu = True
+                    self.play = False
+                    self.menu = True
                     self.save()
                 self.move_locations(dest)
 
