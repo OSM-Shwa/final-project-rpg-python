@@ -4,16 +4,27 @@ import random
 from biomes import biomes
 from map import map
 
-# game options
 OPTIONS = ["NEW GAME", "LOAD GAME", "RULES", "QUIT GAME"]
 
 # stuff for map
 y_len = len(map) - 1
 x_len = len(map[0]) - 1
 
-
 def draw():
     print("xX-------------------------Xx")
+
+# draw lines above the code
+def display_rules():
+    with open("rules.txt", "r") as f:
+        draw()
+        for line in f:
+            print(line.strip("\n"))
+        draw()
+    input("> ")
+
+# clear the screen
+def clear():
+    os.system("clear")
 
 
 # the player
@@ -76,46 +87,33 @@ class UI:
     def __init__(self, player: Player):
         self.player = player
 
-    # clear the screen
-    def clear():
-        os.system("clear")
-
-    # draw lines above the code
-    def display_rules(self):
-        with open("rules.txt", "r") as f:
-            draw()
-            for line in f:
-                print(line.strip("\n"))
-            draw()
-        input("> ")
-
-    def display_game_info(player):
+    def display_game_info(self):
         draw()
-        print(f"LOCATION: {biomes[map[player.y][player.x]]['t']}")
+        print(f"LOCATION: {biomes[map[self.player.y][self.player.x]]['t']}")
         draw()
-        print(f"NAME: {player.name}")
-        print(f"HP: {player.hp}/{player.HPMAX}")
-        print(f"ATK: {player.atk}")
-        print(f"POTIONS: {player.pot}")
-        print(f"ELIXIR: {player.elix}")
-        print(f"GOLD: {player.gold}")
-        print(f"COORDS: {player.x},{player.y}")
+        print(f"NAME: {self.player.name}")
+        print(f"HP: {self.player.hp}/{self.player.HPMAX}")
+        print(f"ATK: {self.player.atk}")
+        print(f"POTIONS: {self.player.pot}")
+        print(f"ELIXIR: {self.player.elix}")
+        print(f"GOLD: {self.player.gold}")
+        print(f"COORDS: {self.player.x},{self.player.y}")
         draw()
         print("0 - SAVE AND QUIT")
-        if player.y > 0:
+        if self.player.y > 0:
             print("1 - NORTH")
-        if player.x < x_len:
+        if self.player.x < x_len:
             print("2 - EAST")
-        if player.y < y_len:
+        if self.player.y < y_len:
             print("3 - SOUTH")
-        if player.x > 0:
+        if self.player.x > 0:
             print("4 - WEST")
-        if player.hp < player.HPMAX:
-            if player.pot > 0:
+        if self.player.hp < self.player.HPMAX:
+            if self.player.pot > 0:
                 print("5 - USE POTION (30HP)")
-            if player.elix > 0:
+            if self.player.elix > 0:
                 print("6 - USE ELIXIR (50HP)")
-        if map[player.y][player.x] in ["shop", "mayor", "cave"]:
+        if map[self.player.y][self.player.x] in ["shop", "mayor", "cave"]:
             print("7 - ENTER")
         draw()
 
@@ -148,18 +146,7 @@ class Game:
 
     # saves the player's data to a file
     def save(self):
-        list = [
-            str(self.player.name),
-            str(self.player.hp),
-            str(self.player.atk),
-            str(self.player.pot),
-            str(self.player.elix),
-            str(self.player.gold),
-            str(self.player.x),
-            str(self.player.y),
-            bool(self.player.key),
-        ]
-
+        list = [str(i) for i in self.player.__dict__.values()]
         with open("load.txt", "w") as f:
             for item in list:
                 f.write(f"{item} \n")
@@ -170,17 +157,18 @@ class Game:
 
         with open("load.txt", "r") as f:
             load_list = f.readlines()
-            if len(load_list) == 9:
+            if len(load_list) == 10:
                 name = str(load_list[0][:-1].strip())
                 hp = int(load_list[1][:-1])
-                atk = int(load_list[2][:-1])
-                pot = int(load_list[3][:-1])
-                elix = int(load_list[4][:-1])
-                gold = int(load_list[5][:-1])
-                x = int(load_list[6][:-1])
-                y = int(load_list[7][:-1])
-                key = bool(load_list[8][:-1])
-                self.ui.clear()
+                HPMAX = int(load_list[2])
+                atk = int(load_list[3][:-1])
+                pot = int(load_list[4][:-1])
+                elix = int(load_list[5][:-1])
+                gold = int(load_list[6][:-1])
+                x = int(load_list[7][:-1])
+                y = int(load_list[8][:-1])
+                key = bool(load_list[9][:-1])
+                clear()
                 print(f"Welcome back, {name}!")
                 input("> ")
                 self.menu = False
@@ -218,7 +206,7 @@ class Game:
         gold = enemy.gold
 
         while self.fight:
-            self.ui.clear()
+            clear()
             draw()
             print(f"Defeat the {enemy.name}!")
             draw()
@@ -290,7 +278,7 @@ class Game:
 
     def mayor(self):
         while self.speak:
-            self.ui.clear()
+            clear()
             draw()
             print(f"Hello there, {self.player.name}!")
             if self.player.atk < 10:
@@ -316,7 +304,7 @@ class Game:
 
         while self.buy:
             self.save()
-            self.ui.clear()
+            clear()
             draw()
             print("Welcome to the shop!")
             draw()
@@ -361,7 +349,7 @@ class Game:
 
     def cave(self):
         while self.boss:
-            self.ui.clear()
+            clear()
             draw()
             print(f"Here lies the cave of the {self.b.name}. What will you do?")
             draw()
@@ -433,7 +421,7 @@ class Game:
     def run(self):
         while self.running:
             while self.menu:
-                self.ui.clear()
+                clear()
                 draw()
                 # print the options to the screen
                 for idx, option in enumerate(OPTIONS, start=1):
@@ -442,7 +430,7 @@ class Game:
                 choice = input("# ")
 
                 if choice == "1":
-                    self.ui.clear()
+                    clear()
                     self.player.set_name()
                     self.menu = False
                     self.play = True
@@ -463,21 +451,24 @@ class Game:
                 self.save()  # autosave
 
                 if not self.standing:
-                    if biomes[map[player.y][player.x]]["e"]:
+                    if biomes[map[self.player.y][self.player.x]]["e"]:
                         if random.randint(0, 100) <= 30:
                             self.fight = True
                             self.battle()
 
-                self.ui.clear()
+                clear()
 
                 if self.play:
-                    self.ui.display_game_info(player)
+                    self.ui.display_game_info()
                     action = input("# ")
                     self.action(action)
 
-
-if __name__ == "__main__":
+def main() -> None:
     player = Player()
     ui = UI(player)
-    game = Game(UI, player)
+    game = Game(ui, player)
     game.run()
+
+
+if __name__ == "__main__":
+    main()
