@@ -4,17 +4,39 @@ import random
 from biomes import biomes
 from map import map
 
-OPTIONS = ["NEW GAME", "LOAD GAME", "RULES", "QUIT GAME"]
-
+        
 # stuff for map
 y_len = len(map) - 1
 x_len = len(map[0]) - 1
 
-def draw():
+def read_int(prompt: str, min_value: int = 0, max_value: int = 5) -> int:
+    """Read an integer between a min and max value."""
+    
+    while True:
+        line = input(prompt)
+        try:
+            value = int(line)
+            if value < min_value:
+                print(f"The minimum value is {min_value}. Try again.")
+            elif value > max_value:
+                print(f"The maximum value is {max_value}. Try again.")
+            else:
+                return value
+        except ValueError:
+            print("That's not a number! Try again.")
+
+
+def invalid():
+    print("Invalid option")
+    input("> ")
+    
+    
+def draw() -> None:
+    """draw lines above the code """
+    
     print("xX-------------------------Xx")
 
-# draw lines above the code
-def display_rules():
+def display_rules() -> None:
     with open("rules.txt", "r") as f:
         draw()
         for line in f:
@@ -22,9 +44,11 @@ def display_rules():
         draw()
     input("> ")
 
-# clear the screen
 def clear():
+    """clear the screen"""
+    
     os.system("clear")
+
 
 
 # the player
@@ -143,6 +167,12 @@ class Game:
         self.create_enemy("Ogre", 35, 5, 18)
         self.create_enemy("Slime", 30, 2, 12)
         self.b = Boss("Dragon", 100, 8, 100)
+        self.GAME_OPTIONS = {
+        "new game": self.new_game,
+        "load game": self.load_game,
+        "rules":self.rules,
+        "quit":quit
+        }
 
     # saves the player's data to a file
     def save(self):
@@ -222,15 +252,15 @@ class Game:
                 print("3 - USE ELIXIR (50HP)")
             draw()
 
-            choice = input("# ")
-            if choice == "1":
+            choice = read_int("# ", max_value=3)
+            if choice == 1:
                 hp -= self.player.atk
                 print(f"You dealt {self.player.atk} damage to the {enemy.name}!")
                 if hp > 0:
                     self.player.hp -= atk
                     print(f"{enemy.name} dealt {atk} damage to the you!")
                 input("> ")
-            elif choice == "2":
+            elif choice == 2:
                 if self.player.pot > 0:
                     self.player.pot -= 1
                     self.heal(30)
@@ -239,7 +269,7 @@ class Game:
                 else:
                     print("No potions!")
                 input("> ")
-            elif choice == "3":
+            elif choice == 3:
                 if self.player.elix > 0:
                     self.player.elix -= 1
                     self.heal(50)
@@ -274,6 +304,7 @@ class Game:
                     self.running = False
                     self.play = False
 
+                self.save()
                 input("> ")
 
     def mayor(self):
@@ -296,8 +327,8 @@ class Game:
             print("1 - LEAVE")
             draw()
 
-            choice = input("# ")
-            if choice == "1":
+            choice = read_int("# ", max_value=1)
+            if choice == 1:
                 self.speak = False
 
     def shop(self):
@@ -319,8 +350,8 @@ class Game:
             print("4 - LEAVE")
             draw()
 
-            choice = input("# ")
-            if choice == "1":
+            choice = read_int("# ", max_value=4)
+            if choice == 1:
                 if self.player.gold >= 5:
                     self.player.pot += 1
                     self.player.gold -= 5
@@ -328,7 +359,7 @@ class Game:
                 else:
                     print("You don't have enough gold for this item...")
                 input("> ")
-            elif choice == "2":
+            elif choice == 2:
                 if self.player.gold >= 8:
                     self.player.elix += 1
                     self.player.gold -= 8
@@ -336,7 +367,7 @@ class Game:
                 else:
                     print("You don't have enough gold for this item...")
                 input("> ")
-            elif choice == "3":
+            elif choice == 3:
                 if self.player.gold >= 10:
                     self.player.atk += 2
                     self.player.gold -= 10
@@ -344,7 +375,7 @@ class Game:
                 else:
                     print("You don't have enough gold for this item...")
                 input("> ")
-            elif choice == "4":
+            elif choice == 4:
                 self.buy = False
 
     def cave(self):
@@ -358,36 +389,36 @@ class Game:
                 print("1 - USE KEY")
             print("2 - TURN BACK")
 
-            choice = input("# ")
-            if choice == "1":
+            choice = read_int("# ", max_value=2)
+            if choice == 1:
                 if self.player.key:
                     self.fight = True
                     self.battle()
-            elif choice == "2":
+            elif choice == 2:
                 self.boss = False
 
     def action(self, dest):
-        if dest == "0":  # get back to main menu
+        if dest == 0:  # get back to main menu
             self.play = False
             self.menu = True
             self.save()
-        if dest == "1":
+        if dest == 1:
             if self.player.y > 0:
                 self.player.y -= 1
                 self.standing = False
-        elif dest == "2":
+        elif dest == 2:
             if self.player.x < x_len:
                 self.player.x += 1
                 self.standing = False
-        elif dest == "3":
+        elif dest == 3:
             if self.player.y < y_len:
                 self.player.y += 1
                 self.standing = False
-        elif dest == "4":
+        elif dest == 4:
             if self.player.x > 0:
                 self.player.x -= 1
                 self.standing = False
-        elif dest == "5":
+        elif dest == 5:
             if self.player.hp == self.player.HPMAX:
                 print("Health is already full!")
             elif self.player.pot > 0:
@@ -396,7 +427,7 @@ class Game:
             else:
                 print("No potions!")
             input("> ")
-        elif dest == "6":
+        elif dest == 6:
             if self.player.hp == self.player.HPMAX:
                 print("Health is already full!")
             elif self.player.elix > 0:
@@ -405,7 +436,7 @@ class Game:
             else:
                 print("No elixir!")
             input("> ")
-        elif dest == "7":
+        elif dest == 7:
             if map[self.player.y][self.player.x] == "shop":
                 self.buy = True
                 self.shop()
@@ -417,35 +448,45 @@ class Game:
                 self.cave()
         else:
             self.standing = True
+    
+    def new_game(self):
+        clear()
+        self.player.set_name()
+        self.menu = False
+        self.play = True
 
+    def load_game(self):
+        try:
+            self.load()
+        except OSError:
+            print("\nNo loadable save file!")
+            input("> ")
+
+    def rules(self):
+        display_rules()
+        return ""
+
+    def test(self):
+        print("this is a test to see if this works")
+    
+        
+    def start(self, option: str) -> str:
+        return self.GAME_OPTIONS.get(option, invalid)()
+
+    def display_game_options(self):
+        for key in self.GAME_OPTIONS.keys():
+            print(f"- {key}")
+    
     def run(self):
         while self.running:
             while self.menu:
                 clear()
                 draw()
                 # print the options to the screen
-                for idx, option in enumerate(OPTIONS, start=1):
-                    print(f"{idx}. {option}")
+                self.display_game_options()
                 draw()
-                choice = input("# ")
-
-                if choice == "1":
-                    clear()
-                    self.player.set_name()
-                    self.menu = False
-                    self.play = True
-                elif choice == "2":
-                    try:
-                        self.load()
-                    except OSError:
-                        print("\nNo loadable save file!")
-                        input("> ")
-
-                elif choice == "3":
-                    choice = ""
-                    self.ui.display_rules()
-                elif choice == "4":
-                    quit()
+                choice = input("")
+                self.start(choice)
 
             while self.play:
                 self.save()  # autosave
@@ -457,11 +498,14 @@ class Game:
                             self.battle()
 
                 clear()
-
                 if self.play:
                     self.ui.display_game_info()
-                    action = input("# ")
+                    action = read_int("# ", max_value=7)
                     self.action(action)
+
+
+
+
 
 def main() -> None:
     player = Player()
