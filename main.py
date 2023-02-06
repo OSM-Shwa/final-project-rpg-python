@@ -1,9 +1,11 @@
 import os
 import random
+import json
 
 from biomes import biomes
 from map import map
 
+players = {}
         
 # stuff for map
 y_len = len(map) - 1
@@ -46,9 +48,17 @@ def display_rules() -> None:
 
 def clear():
     """clear the screen"""
-    
     os.system("clear")
 
+
+def get_player_name():
+    clear()
+    while True:
+        name = input("# What's your name, hero? ").strip()
+        if name == "":
+            print("Invalid input. Try again.")
+            continue
+        return name
 
 
 # the player
@@ -65,7 +75,7 @@ class Player:
         gold=50,
         x=0,
         y=0,
-        key=False,
+        key=0,
     ):
         self.name = name
         self.hp = hp
@@ -78,15 +88,8 @@ class Player:
         self.y = y
         self.key = key
 
-    # sets the player's name
-    def set_name(self):
-        while True:
-            self.name = input("# What's your name, hero? ").strip()
-            if self.name == "":
-                print("Invalid input. Try again.")
-                continue
-            break
-
+    def __repr__(self):
+        return f"Player: {self.name}"
 
 # creates some enemies
 class Enemy:
@@ -96,21 +99,16 @@ class Enemy:
         self.atk = atk
         self.gold = gold
 
-    def __str__(self):
-        return self.name
+# the main game
+class Game:
 
+    enemies = []
 
-# this is the boss class which has all the same variables as a regular enemy
-class Boss(Enemy):
-    def __init__(self, name: str, hp: int, atk: int, gold: int):
-        super().__init__(name, hp, atk, gold)
+    # creates an enemy with these stats
+    def create_enemy(self, name: str, hp: int, atk: int, gold: int):
+        self.enemies.append(Enemy(name, hp, atk, gold))
 
-
-# handles displaying things
-class UI:
-    def __init__(self, player: Player):
-        self.player = player
-
+        
     def display_game_info(self):
         draw()
         print(f"LOCATION: {biomes[map[self.player.y][self.player.x]]['t']}")
@@ -140,21 +138,9 @@ class UI:
         if map[self.player.y][self.player.x] in ["shop", "mayor", "cave"]:
             print("7 - ENTER")
         draw()
-
-
-# the main game
-class Game:
-
-    enemies = []
-
-    # creates an enemy with these stats
-    def create_enemy(self, name: str, hp: int, atk: int, gold: int):
-        self.enemies.append(Enemy(name, hp, atk, gold))
-
+    
     # when you start the game, create some enemies
-    def __init__(self, ui: UI, player: Player):
-        self.ui = ui
-        self.player = player
+    def __init__(self):
         self.running = True
         self.menu = True
         self.play = False
@@ -166,58 +152,56 @@ class Game:
         self.create_enemy("Goblin", 15, 3, 8)
         self.create_enemy("Ogre", 35, 5, 18)
         self.create_enemy("Slime", 30, 2, 12)
-        self.b = Boss("Dragon", 100, 8, 100)
+        self.b = Enemy("Dragon", 100, 8, 100)
         self.GAME_OPTIONS = {
         "new game": self.new_game,
-        "load game": self.load_game,
+        "load game": self.load,
         "rules":self.rules,
         "quit":quit
         }
 
     # saves the player's data to a file
     def save(self):
-        list = [str(i) for i in self.player.__dict__.values()]
-        with open("load.txt", "w") as f:
-            for item in list:
-                f.write(f"{item} \n")
+        players[self.player.name] = self.player
 
     # retrieves the player's data and uses that to load the game
     def load(self):
         # load a previous game
-
-        with open("load.txt", "r") as f:
-            load_list = f.readlines()
-            if len(load_list) == 10:
-                name = str(load_list[0][:-1].strip())
-                hp = int(load_list[1][:-1])
-                HPMAX = int(load_list[2])
-                atk = int(load_list[3][:-1])
-                pot = int(load_list[4][:-1])
-                elix = int(load_list[5][:-1])
-                gold = int(load_list[6][:-1])
-                x = int(load_list[7][:-1])
-                y = int(load_list[8][:-1])
-                key = bool(load_list[9][:-1])
-                clear()
+         while True:   
+            name = get_player_name()
+            self.player = players.get(name, None)
+            if self.player is not None:
                 print(f"Welcome back, {name}!")
                 input("> ")
                 self.menu = False
                 self.play = True
-                return self.player.__init__(
-                    name=name,
-                    hp=hp,
-                    atk=atk,
-                    pot=pot,
-                    elix=elix,
-                    gold=gold,
-                    x=x,
-                    y=y,
-                    key=key,
-                )
+                break
             else:
-                print("\nCorrupt save file!")
-                input("> ")
+                choice = self.player_dne()
+                if choice == 1:
+                    break
+                else:
+                    continue
+                
+    @staticmethod
+    def player_dne():
+        print("Player does not exist.")
+        input("> ")
+        while True:
+            draw()
+            print("1 - Return to Main Menu")
+            print("2 - Try again")
+            draw()
+            choice = input("# ")
+            if choice == "1":
+                return 1
+            elif choice == "2":
+                return 2
+            else:
+                print("Invalid choice. Try again.")
 
+         
+            
     def heal(self, amount):
         if self.player.hp + amount < self.player.HPMAX:
             self.player.hp += amount
@@ -316,12 +300,12 @@ class Game:
                 print(
                     "You are not strong enough to face the dragon yet. Keep practicing and come back later!"
                 )
-                self.player.key = False
+                self.player.key = 0
             else:
                 print(
                     "You might want to take on the dragon now! Take this key but be careful with the beast..."
                 )
-                self.player.key = True
+                self.player.key = 1
 
             draw()
             print("1 - LEAVE")
@@ -385,13 +369,13 @@ class Game:
             print(f"Here lies the cave of the {self.b.name}. What will you do?")
             draw()
 
-            if self.player.key:
+            if self.player.key == 1:
                 print("1 - USE KEY")
             print("2 - TURN BACK")
 
             choice = read_int("# ", max_value=2)
             if choice == 1:
-                if self.player.key:
+                if self.player.key == 1:
                     self.fight = True
                     self.battle()
             elif choice == 2:
@@ -449,26 +433,18 @@ class Game:
         else:
             self.standing = True
     
+    def create_player(self, name: str):
+        players[name] = Player(name=name)
+        self.player = players[name]
+    
     def new_game(self):
-        clear()
-        self.player.set_name()
+        self.create_player(name=get_player_name())
         self.menu = False
         self.play = True
-
-    def load_game(self):
-        try:
-            self.load()
-        except OSError:
-            print("\nNo loadable save file!")
-            input("> ")
 
     def rules(self):
         display_rules()
         return ""
-
-    def test(self):
-        print("this is a test to see if this works")
-    
         
     def start(self, option: str) -> str:
         return self.GAME_OPTIONS.get(option, invalid)()
@@ -482,11 +458,13 @@ class Game:
             while self.menu:
                 clear()
                 draw()
+                
                 # print the options to the screen
                 self.display_game_options()
                 draw()
                 choice = input("")
                 self.start(choice)
+                
 
             while self.play:
                 self.save()  # autosave
@@ -499,20 +477,19 @@ class Game:
 
                 clear()
                 if self.play:
-                    self.ui.display_game_info()
+                    self.display_game_info()
                     action = read_int("# ", max_value=7)
                     self.action(action)
 
-
+def load_players():
+    with open("players.txt", "w") as file:
+        json.dumps(players.values())
 
 
 
 def main() -> None:
-    player = Player()
-    ui = UI(player)
-    game = Game(ui, player)
+    game = Game()
     game.run()
-
 
 if __name__ == "__main__":
     main()
