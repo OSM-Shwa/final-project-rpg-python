@@ -1,11 +1,11 @@
 import os
 import random
-import json
+
 
 from biomes import biomes
 from map import map
 
-players = {}
+players = dict()
         
 # stuff for map
 y_len = len(map) - 1
@@ -102,7 +102,7 @@ class Enemy:
 # the main game
 class Game:
 
-    enemies = []
+    enemies = list()
 
     # creates an enemy with these stats
     def create_enemy(self, name: str, hp: int, atk: int, gold: int):
@@ -160,7 +160,7 @@ class Game:
         "quit":quit
         }
 
-    # saves the player's data to a file
+    # saves the player's data
     def save(self):
         players[self.player.name] = self.player
 
@@ -381,57 +381,58 @@ class Game:
             elif choice == 2:
                 self.boss = False
 
-    def action(self, dest):
-        if dest == 0:  # get back to main menu
-            self.play = False
-            self.menu = True
-            self.save()
-        if dest == 1:
-            if self.player.y > 0:
-                self.player.y -= 1
-                self.standing = False
-        elif dest == 2:
-            if self.player.x < x_len:
-                self.player.x += 1
-                self.standing = False
-        elif dest == 3:
-            if self.player.y < y_len:
-                self.player.y += 1
-                self.standing = False
-        elif dest == 4:
-            if self.player.x > 0:
-                self.player.x -= 1
-                self.standing = False
-        elif dest == 5:
-            if self.player.hp == self.player.HPMAX:
-                print("Health is already full!")
-            elif self.player.pot > 0:
-                self.player.pot -= 1
-                self.heal(40)
-            else:
-                print("No potions!")
-            input("> ")
-        elif dest == 6:
-            if self.player.hp == self.player.HPMAX:
-                print("Health is already full!")
-            elif self.player.elix > 0:
-                self.player.elix -= 1
-                self.heal(50)
-            else:
-                print("No elixir!")
-            input("> ")
-        elif dest == 7:
-            if map[self.player.y][self.player.x] == "shop":
-                self.buy = True
-                self.shop()
-            elif map[self.player.y][self.player.x] == "mayor":
-                self.speak = True
-                self.mayor()
-            elif map[self.player.y][self.player.x] == "cave":
-                self.boss = True
-                self.cave()
-        else:
-            self.standing = True
+    def action(self, action):
+        match action:
+            case 0:
+                self.play = False
+                self.menu = True
+                self.save()
+            case 1:
+                if self.player.y > 0:
+                    self.player.y -= 1
+                    self.standing = False
+            case 2:
+                if self.player.x < x_len:
+                    self.player.x += 1
+                    self.standing = False
+            case 3:
+                if self.player.y < y_len:
+                    self.player.y += 1
+                    self.standing = False
+            case 4:
+                if self.player.x > 0:
+                    self.player.x -= 1
+                    self.standing = False
+            case 5:
+                if self.player.hp == self.player.HPMAX:
+                    print("Health is already full!")
+                elif self.player.pot > 0:
+                    self.player.pot -= 1
+                    self.heal(40)
+                else:
+                    print("No potions!")
+                input("> ")
+            case 6:
+                if self.player.hp == self.player.HPMAX:
+                    print("Health is already full!")
+                elif self.player.elix > 0:
+                    self.player.elix -= 1
+                    self.heal(50)
+                else:
+                    print("No elixir!")
+                input("> ")
+            case 7:
+                if map[self.player.y][self.player.x] == "shop":
+                    self.buy = True
+                    self.shop()
+                elif map[self.player.y][self.player.x] == "mayor":
+                    self.speak = True
+                    self.mayor()
+                elif map[self.player.y][self.player.x] == "cave":
+                    self.boss = True
+                    self.cave()
+            case other:
+                self.standing = True
     
     def create_player(self, name: str):
         players[name] = Player(name=name)
@@ -480,10 +481,6 @@ class Game:
                     self.display_game_info()
                     action = read_int("# ", max_value=7)
                     self.action(action)
-
-def load_players():
-    with open("players.txt", "w") as file:
-        json.dumps(players.values())
 
 
 
